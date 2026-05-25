@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>สถานีวิทยุธรรมะ | Premium UI</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+            background-color: #121212;
+        }
+        /* ภาพพื้นหลังแบบเบลอ */
+        #bg-image {
+            position: absolute;
+            top: -10%; left: -10%;
+            width: 120%; height: 120%;
+            background-size: cover;
+            background-position: center;
+            filter: blur(20px) brightness(0.3);
+            z-index: -1;
+            transition: background-image 1s ease-in-out;
+        }
+        .player-container {
+            background: rgba(20, 20, 20, 0.7);
+            backdrop-filter: blur(15px);
+            padding: 40px 30px;
+            border-radius: 25px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.6);
+            text-align: center;
+            width: 380px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .cover-wrapper {
+            position: relative;
+            width: 250px;
+            height: 250px;
+            margin: 0 auto 25px auto;
+        }
+        #cover-art {
+            width: 100%; height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            border: 4px solid rgba(255,255,255,0.1);
+            transition: all 0.5s ease;
+        }
+        /* อนิเมชันแผ่นเสียงหมุน */
+        .spin {
+            animation: spin-record 10s linear infinite;
+        }
+        @keyframes spin-record {
+            100% { transform: rotate(360deg); }
+        }
+        .info h2 {
+            font-size: 1.3rem;
+            margin-bottom: 8px;
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .info h3 {
+            font-size: 0.9rem;
+            color: #b3b3b3;
+            font-weight: 400;
+            margin-bottom: 30px;
+        }
+        /* ปุ่มควบคุม Custom */
+        .controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 25px;
+        }
+        .btn {
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: color 0.2s, transform 0.2s;
+        }
+        .btn:hover { color: #4da8da; transform: scale(1.1); }
+        .btn-play {
+            width: 60px; height: 60px;
+            border-radius: 50%;
+            background: #4da8da;
+            color: #121212;
+            font-size: 1.5rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .btn-play:hover { background: #3a8ebf; color: #121212; }
+    </style>
+</head>
+<body>
+
+    <div id="bg-image"></div>
+
+    <div class="player-container">
+        <div class="cover-wrapper">
+            <img id="cover-art" src="https://via.placeholder.com/250" alt="Cover Art">
+        </div>
+        
+        <div class="info">
+            <h2 id="track-title">กำลังเชื่อมต่อ...</h2>
+            <h3 id="track-artist">สถานีวิทยุธรรมะ</h3>
+        </div>
+        
+        <div class="controls">
+            <button class="btn" onclick="updatePlayer()"><i class="fa-solid fa-rotate-right"></i></button>
+            <button class="btn btn-play" id="play-pause-btn" onclick="togglePlay()">
+                <i class="fa-solid fa-play" id="play-icon"></i>
+            </button>
+            <button class="btn" onclick="toggleMute()"><i class="fa-solid fa-volume-high" id="volume-icon"></i></button>
+        </div>
+
+        <audio id="audio-player" crossorigin="anonymous">
+            <source id="audio-source" src="" type="audio/mpeg">
+        </audio>
+    </div>
+
+    <script>
+        const API_URL = 'https://dip-huge-warnings-june.trycloudflare.com/api/nowplaying/1';
+        const audio = document.getElementById('audio-player');
+        const playIcon = document.getElementById('play-icon');
+        const coverArt = document.getElementById('cover-art');
+
+        let currentStreamUrl = "";
+
+        async function updatePlayer() {
+            try {
+                const response = await fetch(API_URL);
+                const data = await response.json();
+
+                // อัปเดตข้อความ
+                document.getElementById('track-title').innerText = data.now_playing.song.title || data.now_playing.song.text;
+                document.getElementById('track-artist').innerText = data.now_playing.song.artist || 'ไม่ทราบชื่อศิลปิน';
+                
+                // อัปเดตรูปปกและพื้นหลัง
+                if (data.now_playing.song.art) {
+                    const artUrl = data.now_playing.song.art;
+                    coverArt.src = artUrl;
+                    document.getElementById('bg-image').style.backgroundImage = `url(${artUrl})`;
+                }
+
+                // เตรียมลิงก์เสียง
+                const newStreamUrl = data.station.listen_url;
+                if (currentStreamUrl !== newStreamUrl) {
+                    currentStreamUrl = newStreamUrl;
+                    document.getElementById('audio-source').src = currentStreamUrl;
+                    audio.load();
+                }
+            } catch (error) {
+                console.error("API Error:", error);
+            }
+        }
+
+        // ระบบปุ่ม Play/Pause Custom
+        function togglePlay() {
+            if (audio.paused) {
+                audio.play();
+                playIcon.classList.remove('fa-play');
+                playIcon.classList.add('fa-pause');
+                coverArt.classList.add('spin');
+            } else {
+                audio.pause();
+                playIcon.classList.remove('fa-pause');
+                playIcon.classList.add('fa-play');
+                coverArt.classList.remove('spin');
+            }
+        }
+
+        // ระบบเปิด/ปิดเสียง
+        function toggleMute() {
+            const volIcon = document.getElementById('volume-icon');
+            audio.muted = !audio.muted;
+            if (audio.muted) {
+                volIcon.classList.remove('fa-volume-high');
+                volIcon.classList.add('fa-volume-xmark');
+            } else {
+                volIcon.classList.remove('fa-volume-xmark');
+                volIcon.classList.add('fa-volume-high');
+            }
+        }
+
+        // ดึงข้อมูลก๊อกแรก และตั้งเวลาดึงเรื่อยๆ
+        updatePlayer();
+        setInterval(updatePlayer, 10000);
+    </script>
+</body>
+</html>
