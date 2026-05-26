@@ -23,8 +23,8 @@
             width: 120%; height: 120%;
             background-size: cover;
             background-position: center;
-            /* ใส่รูปพื้นหลังเริ่มต้น */
-            background-image: url('https://images.unsplash.com/photo-1608222306232-cb6f35eb270a?q=80&w=1000&auto=format&fit=crop');
+            /* 🎯 จุดที่ 1: ลิงก์รูปภาพพื้นหลัง (เบลอๆ) */
+            background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/Wat_Arun_Temple_of_Dawn_Bangkok_Thailand.jpg/1024px-Wat_Arun_Temple_of_Dawn_Bangkok_Thailand.jpg');
             filter: blur(20px) brightness(0.3);
             z-index: -1;
         }
@@ -103,7 +103,7 @@
 
     <div class="player-container">
         <div class="cover-wrapper">
-            <img id="cover-art" src="https://images.unsplash.com/photo-1608222306232-cb6f35eb270a?q=80&w=500&auto=format&fit=crop" alt="Cover Art">
+            <img id="cover-art" src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/Wat_Arun_Temple_of_Dawn_Bangkok_Thailand.jpg/1024px-Wat_Arun_Temple_of_Dawn_Bangkok_Thailand.jpg" alt="Cover Art">
         </div>
         
         <div class="info">
@@ -131,16 +131,16 @@
 
         function togglePlay() {
             if (audio.paused) {
-                audio.load(); // รีเฟรชให้เสียงเป็นปัจจุบันเสมอ
+                audio.load(); 
                 audio.play();
                 playIcon.classList.remove('fa-play');
                 playIcon.classList.add('fa-pause');
-                coverArt.classList.add('spin'); // สั่งแผ่นหมุน
+                coverArt.classList.add('spin'); 
             } else {
                 audio.pause();
                 playIcon.classList.remove('fa-pause');
                 playIcon.classList.add('fa-play');
-                coverArt.classList.remove('spin'); // สั่งแผ่นหยุด
+                coverArt.classList.remove('spin'); 
             }
         }
 
