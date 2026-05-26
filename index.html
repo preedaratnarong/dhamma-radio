@@ -23,7 +23,7 @@
             width: 120%; height: 120%;
             background-size: cover;
             background-position: center;
-            /* 🎯 จุดที่ 1: ลิงก์รูปภาพพื้นหลัง (เบลอๆ) */
+            /* 🎯 ลิงก์รูปภาพพื้นหลัง */
             background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/Wat_Arun_Temple_of_Dawn_Bangkok_Thailand.jpg/1024px-Wat_Arun_Temple_of_Dawn_Bangkok_Thailand.jpg');
             filter: blur(20px) brightness(0.3);
             z-index: -1;
@@ -131,6 +131,7 @@
 
         function togglePlay() {
             if (audio.paused) {
+                // สำหรับวิทยุออนไลน์ การ Load ใหม่คือการดึงเสียงที่เป็นปัจจุบันที่สุด
                 audio.load(); 
                 audio.play();
                 playIcon.classList.remove('fa-play');
